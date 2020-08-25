@@ -127,7 +127,7 @@ export default {
 		onSortChange(params) {
 			console.log('params :>> ', params);
 			this.updateParams({
-				sort: params,
+				sort: params
 			});
 			this.LoadGridItems();
 		},
@@ -140,12 +140,4 @@ export default {
 </script>
 
 <style scoped>
-.TextBlue {
-	color: #144ae8;
-	font-weight: bold;
-}
-.TextRed {
-	color: #c32d2d;
-	font-weight: bold;
-}
 </style>
