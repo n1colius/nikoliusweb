@@ -13,10 +13,32 @@ router.get("/menu_admin_coba", async(req,res) => {
     let Page = Number.parseInt(req.query.page);
     let PerPage = Number.parseInt(req.query.perPage);
     let Offset = (Page - 1) * PerPage;
+    let SortFilter = req.query.sort;
+    let SortArrayQuery = []; //Array
+    let ObjTmp = {};
+    let SortQuery = 'id desc'; //default sorting
 
     //Sorting disini
-    console.log('req.query.sort :>> ', req.query.sort);
-    //LANJUT PROSES SORTING UNTUK QUERY!!!!!
+    if(Object.prototype.toString.call(SortFilter) === '[object Array]') {
+        Object.keys(SortFilter).forEach(key => {
+            ObjTmp = JSON.parse(SortFilter[key]);
+            SortArrayQuery.push(ObjTmp.field+' '+ObjTmp.type);
+        });
+
+        if(SortArrayQuery.length > 0) {
+            SortQuery = SortArrayQuery.join(' , ');
+        }
+    }
+
+    //Searching disini
+    let SearchString = JSON.parse(req.query.columnFilters);
+    let SearchQuery = '';
+    if(SearchString.SearchName != '') {
+        SearchQuery = SearchQuery+` AND CONCAT(first_name,' ',last_name) LIKE '%${SearchString.SearchName}%' `;
+    }
+    if(SearchString.SearchEmail != '') {
+        SearchQuery = SearchQuery+` AND email LIKE '%${SearchString.SearchEmail}%' `;
+    }
 
     try {
         let queryNya = `SELECT SQL_CALC_FOUND_ROWS
@@ -28,8 +50,12 @@ router.get("/menu_admin_coba", async(req,res) => {
                             CONCAT('',added) AS added
                         FROM
                             authors
+                        WHERE 1=1
+                        ${SearchQuery}
+                        ORDER BY ${SortQuery}
                         LIMIT ?,?
                         `;
+        //console.log('queryNya :>> ', queryNya);
         const DataAuthor = await sql.query(queryNya, [Offset,PerPage]);
 
         //Get Total Rows
@@ -46,30 +72,36 @@ router.get("/menu_admin_coba", async(req,res) => {
     }
 });
 
-router.get("/refresh", authen, async(req,res) => {
-    //Buat payload token jwt
-    const JwtPayload = {
-        UserId: req.userauth.UserId,
-        UserEmail: req.userauth.UserEmail,
-        UserFullname: req.userauth.UserFullname
-    };
+router.get("/refresh", authen, async (req,res) => {
+    try {
+        //Buat payload token jwt
+        const JwtPayload = {
+            UserId: req.userauth.UserId,
+            UserEmail: req.userauth.UserEmail,
+            UserFullname: req.userauth.UserFullname
+        };
 
-    jwt.sign(
-        JwtPayload,
-        process.env.JWTSECRET,
-        { expiresIn: 3600 },
-        (err, token) => {
-            if(err) return res.status(500).json({success: false, message: 'Refresh Token Failed'});
-
-            const DataReturn = {
-                UserId: req.userauth.UserId,
-                UserEmail: req.userauth.UserEmail,
-                UserFullname: req.userauth.UserFullname,
-                Token: token
-            };
-            return res.status(200).json({success: true, message: 'Refresh Success', DataReturn: DataReturn});
-        }
-    );
+        jwt.sign(
+            JwtPayload,
+            process.env.JWTSECRET,
+            { expiresIn: 3600 },
+            (err, token) => {
+                if(err) {
+                    return res.status(500).json({success: false, message: 'Refresh Token Failed'});
+                } else {
+                    const DataReturn = {
+                        UserId: req.userauth.UserId,
+                        UserEmail: req.userauth.UserEmail,
+                        UserFullname: req.userauth.UserFullname,
+                        Token: token
+                    };
+                    return res.status(200).json({success: true, message: 'Refresh Success', DataReturn: DataReturn});
+                }
+            }
+        );    
+    } catch (err) {
+        return res.status(500).json({success: 'failed'});
+    }
 });
 
 router.post('/', [

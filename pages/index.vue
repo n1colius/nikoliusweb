@@ -10,7 +10,7 @@
             Halo, Saya Nikolius
           </h1>
           <h2 class="subtitle is-4">
-            Saya adalah seorang Web Developer. Ini adalah webpage personal saya
+            Saya seorang Web Developer. Ini adalah webpage personal saya
           </h2>
           <br />
 

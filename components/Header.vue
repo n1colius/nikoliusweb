@@ -16,13 +16,14 @@
                         <nuxt-link to="/" class="navbar-item is-active">Home</nuxt-link>
                         <nuxt-link to="/portfolio" class="navbar-item">Portfolio</nuxt-link>
                         <nuxt-link to="/" class="navbar-item">Blog</nuxt-link>
-                        <nuxt-link to="/menuadmin" class="navbar-item">Menu Testing</nuxt-link>
+                        <nuxt-link to="/cobacoba" class="navbar-item">Coba</nuxt-link>
+
                         <template v-if="IsLogin">
                             
                             <div class="navbar-item has-dropdown is-hoverable">
                                 <a class="navbar-link">Admin Menu</a>
                                 <div class="navbar-dropdown">
-                                    <a class="navbar-item">Blog</a>
+                                    <nuxt-link class="navbar-item" to="/admin/blogman">Blog</nuxt-link>
                                 </div>
                             </div>
                             <a @click.prevent="ClickLogout()" href="#" class="navbar-item">Logout</a>
@@ -30,7 +31,6 @@
                         <template v-else>
                             <nuxt-link to="/login" class="navbar-item">Login</nuxt-link>
                         </template>
-
                         <!--<div class="navbar-item has-dropdown is-hoverable">
                             <a class="navbar-link">Account</a>
                             <div class="navbar-dropdown">
@@ -46,6 +46,7 @@
 
             </div>
         </nav>
+        <hr class="HeaderSeparator">
 
         <!-- Script click menu burger -->
         <script>
@@ -76,3 +77,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.HeaderSeparator {
+    margin-top:0px;
+}
+</style>

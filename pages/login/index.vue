@@ -142,6 +142,13 @@ export default {
 						}
 					);
 				}
+			} else {
+				this.$toast.show(
+					'<img src="/images/info.png" width="24" />&nbsp;&nbsp;<p>Form is not valid yet</p>',
+					{
+						type: "info"
+					}
+				);
 			}
 		}
 	}

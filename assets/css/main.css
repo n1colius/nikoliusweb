@@ -11,3 +11,11 @@ body {
     opacity: 0;
     transform: scale(0);
 }
+
+form .field {
+    margin-bottom:25px !important;
+}
+
+form .checkbox {
+    margin-right:18px;
+}

@@ -26,7 +26,10 @@ module.exports = {
   ** Global CSS
   */
   css: [
-    '@/assets/css/main.css'
+    '@/assets/css/main.css',
+    'quill/dist/quill.snow.css',
+    'quill/dist/quill.bubble.css',
+    'quill/dist/quill.core.css'
   ],
   /*
   ** Plugins to load before mounting the App
@@ -34,13 +37,16 @@ module.exports = {
   plugins: [
     "~/plugins/axios",
     "~/plugins/vee-validate",
+    '~plugins/vue-js-modal.js',
     { src: '~/plugins/localStorage', ssr: false },
-    { src: '~/plugins/vue-good-table', ssr: false }
+    { src: '~/plugins/vue-good-table', ssr: false },
+    { src: "~plugins/vue-quill-editor.js", ssr: false }
   ],
   /*
   ** Nuxt.js dev-modules
   */
   buildModules: [
+    ['@nuxtjs/moment', { /* module options */ }]
   ],
   /*
   ** Nuxt.js modules

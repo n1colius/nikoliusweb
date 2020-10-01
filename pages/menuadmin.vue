@@ -2,9 +2,25 @@
 	<div class="columns">
 		<div class="column">&nbsp;</div>
 		<div class="column is-four-fifths">
-			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci nihil, alias nesciunt, non perspiciatis labore quaerat mollitia explicabo doloribus asperiores excepturi! Molestias exercitationem nam, error nostrum odit praesentium ut sunt!</p>
-			<br>
 			
+
+			<div class="columns">
+				<div class="column is-6">
+					<div class="field is-grouped">
+						<p class="control is-expanded">
+							<input class="input is-small" type="text" placeholder="Name Search" v-model="serverParams.columnFilters.SearchName">
+						</p>
+						<p class="control is-expanded">
+							<input class="input is-small" type="text" placeholder="Email Search" v-model="serverParams.columnFilters.SearchEmail">
+						</p>
+						<p class="control">
+							<a @click.prevent="onColumnFilter()" class="button is-small is-info">Search</a>
+						</p>
+					</div>
+				</div>
+				<div class="column">&nbsp;</div>
+			</div>
+
 			<vue-good-table
 				mode="remote"
 				@on-page-change="onPageChange"
@@ -53,6 +69,8 @@ export default {
 			totalRecords: 0,
 			serverParams: {
 				columnFilters: {
+					SearchName: '',
+					SearchEmail: ''
 				},
 				sort: {
 					field: '', 
@@ -125,14 +143,12 @@ export default {
 			this.LoadGridItems();
 		},
 		onSortChange(params) {
-			console.log('params :>> ', params);
 			this.updateParams({
 				sort: params
 			});
 			this.LoadGridItems();
 		},
-		onColumnFilter(params) {
-			this.updateParams(params);
+		onColumnFilter() {
 			this.LoadGridItems();
 		}
 	}

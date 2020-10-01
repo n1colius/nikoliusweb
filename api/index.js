@@ -7,6 +7,7 @@ const app = express();
 
 // Require & Import API routes
 app.use('/authen', routes.authen);
+app.use('/blogman', routes.blogman);
 
 // Export the server middleware
 module.exports = {
