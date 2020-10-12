@@ -40,7 +40,8 @@ module.exports = {
     '~plugins/vue-js-modal.js',
     { src: '~/plugins/localStorage', ssr: false },
     { src: '~/plugins/vue-good-table', ssr: false },
-    { src: "~plugins/vue-quill-editor.js", ssr: false }
+    { src: "~plugins/vue-quill-editor.js", ssr: false },
+    '~/plugins/disqus'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -72,7 +73,8 @@ module.exports = {
          }
        ]
       }
-    ]
+    ],
+    'vue-social-sharing/nuxt'
   ],
   toast: {
     position: 'top-right',

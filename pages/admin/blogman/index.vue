@@ -9,7 +9,6 @@
 
 			<div class="columns">
 				<div class="column">
-					<!--<button class="button is-link is-small">Tambah Post</button>-->
 					<nuxt-link
 						to="/admin/blogman/insert"
 						class="button is-link is-small"

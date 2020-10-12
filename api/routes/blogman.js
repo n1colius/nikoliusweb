@@ -9,6 +9,84 @@ const sql = require('../dbconfig');
 const {check,validationResult} = require('express-validator');
 const authen = require('../middleware/authen');
 
+router.get('/front', async(req,res) => {
+    let DataBlog = [];
+    let Query;
+    let BlogCount = Number.parseInt(req.query.BlogCount);
+
+    try {
+        Query = `SELECT
+                    a.BlogId
+                    , a.BlogHeadlinePic
+                    , a.BlogDesc
+                    , a.BlogDate
+                    , a.BlogTitle
+                    , GROUP_CONCAT(c.TagName SEPARATOR ',') AS Tags
+                FROM
+                    blog a
+                    LEFT JOIN blog_tags b ON a.BlogId = b.BlogId
+                    LEFT JOIN tags c ON b.TagId = c.TagId
+                WHERE 1=1
+                    AND a.Status = 'active'
+                GROUP BY a.BlogId
+                ORDER BY a.BlogDate DESC
+                LIMIT 0,? `;
+        DataBlog = await sql.query(Query, [BlogCount]);
+
+        //Get Total Rows
+        Query = `SELECT
+                        COUNT(tgrup.BlogID) AS total
+                    FROM (SELECT
+                        a.BlogId
+                    FROM
+                        blog a
+                        LEFT JOIN blog_tags b ON a.BlogId = b.BlogId
+                        LEFT JOIN tags c ON b.TagId = c.TagId
+                    WHERE 1=1
+                        AND a.Status = 'active'
+                    GROUP BY a.BlogId
+                    ) AS tgrup
+                    `;
+        const DataTotalRows = await sql.query(Query);
+
+        return res.status(200).json({success: true, message: 'Call Success', DataBlog: DataBlog, TotalBlog: DataTotalRows[0].total});
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({success: 'failed'});
+    }
+});
+
+router.get('/front/:id', async(req,res) => {
+    //Param
+    let Querynya;
+    const BlogId = parseInt(req.params.id);
+
+    try {
+        Querynya = `SELECT
+                        a.BlogId,
+                        a.BlogTitle,
+                        a.BlogDesc,
+                        a.BlogHeadlinePic,
+                        a.BlogArticle,
+                        a.BlogDate,
+                        GROUP_CONCAT(c.TagName SEPARATOR ',') AS BlogTags
+                    FROM
+                        blog a
+                        LEFT JOIN blog_tags b ON a.BlogId = b.BlogId
+                        LEFT JOIN tags c ON b.TagId = c.TagId
+                    WHERE
+                        a.BlogId = ?
+                    GROUP BY a.BlogId
+                    LIMIT 1`;
+        const DataForm = await sql.query(Querynya, [BlogId]);
+
+        return res.status(200).json({success: true, message: 'Call Success', DataForm: DataForm[0]});
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({success: 'failed'});
+    }
+});
+
 router.get('/', authen, async(req,res) => {
     let Page = Number.parseInt(req.query.page);
     let PerPage = Number.parseInt(req.query.perPage);
@@ -171,10 +249,10 @@ router.post('/isi', authen, async(req,res) => {
     if(!FormBlogHeadlinePic) FormBlogHeadlinePic = null;
     if(!FormBlogDesc) FormBlogDesc = null;
     if(!FormBlogArticle) FormBlogArticle = null;
-    FormBlogId = parseInt(FormBlogId);
+    FormBlogId = Number.parseInt(FormBlogId);
 
     try {
-        if(FormBlogId == 0) {
+        if(isNaN(FormBlogId)) {
             //Insert
             Query = `INSERT INTO blog SET
                         BlogTitle = ?,

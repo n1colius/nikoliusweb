@@ -15,11 +15,10 @@
                     <div class="navbar-end">
                         <nuxt-link to="/" class="navbar-item is-active">Home</nuxt-link>
                         <nuxt-link to="/portfolio" class="navbar-item">Portfolio</nuxt-link>
-                        <nuxt-link to="/" class="navbar-item">Blog</nuxt-link>
-                        <nuxt-link to="/cobacoba" class="navbar-item">Coba</nuxt-link>
+                        <nuxt-link to="/blog" class="navbar-item">Blog</nuxt-link>
+                        <!--<nuxt-link to="/cobacoba" class="navbar-item">Coba</nuxt-link>-->
 
                         <template v-if="IsLogin">
-                            
                             <div class="navbar-item has-dropdown is-hoverable">
                                 <a class="navbar-link">Admin Menu</a>
                                 <div class="navbar-dropdown">

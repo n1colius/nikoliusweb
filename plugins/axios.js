@@ -26,6 +26,6 @@ export default function ({ $axios, store, $toast, redirect  }) {
                 );
             }
         }
-        redirect('/error'); //biar di redirect ke halaman error
+        redirect('/'); //biar di redirect ke halaman error
     });
 };

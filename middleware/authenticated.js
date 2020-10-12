@@ -1,5 +1,4 @@
 export default function (context) {
-    //console.log('context.store.state :>> ', context.store.state);
     
     if(process.server === true) { //Jika SERVER SIDE!!!!!!!!!!!!!!!
         //Cara cepatnya langsung redirect ke index aja untuk security
