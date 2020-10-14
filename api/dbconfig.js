@@ -1,35 +1,37 @@
+var mysql = require('mysql');
 const util = require('util')
-const mysql = require('mysql')
 
-const pool = mysql.createPool({
-  connectionLimit: 10,
-  host: process.env.DBHOST,
+var pool  = mysql.createPool({
+  connectionLimit : 10,
+  queueLimit: 100,
+  host : process.env.DBHOST,
   port : parseInt(process.env.DBPORT),
-  user: process.env.DBUSER,
-  password: process.env.DBPASS,
-  database: process.env.DBNAME
-})
+  user : process.env.DBUSER,
+  password : process.env.DBPASS,
+  database : process.env.DBNAME,
+  connectTimeout : 10000,
+  waitForConnections: true,
+  acquireTimeout: 10000,
+  debug : false
+});
 
-// Ping database to check for common exception errors.
-pool.getConnection((err, connection) => {
-  if (err) {
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      console.error('Database connection was closed.')
-    }
-    if (err.code === 'ER_CON_COUNT_ERROR') {
-      console.error('Database has too many connections.')
-    }
-    if (err.code === 'ECONNREFUSED') {
-      console.error('Database connection was refused.')
-    }
-  }
+pool.on('connection', function (connection) {
+  console.log('MySQL DB Connection established');
+});
 
-  if (connection) connection.release()
+pool.on('acquire', function (connection) {
+  console.log('Connection %d acquired', connection.threadId);
+});
 
-  return
-})
+pool.on('enqueue', function () {
+  console.log('Waiting for available connection slot...');
+});
+
+pool.on('release', function (connection) {
+  console.log('Connection %d released', connection.threadId);
+});
 
 // Promisify for Node.js async/await.
 pool.query = util.promisify(pool.query)
 
-module.exports = pool
+module.exports = pool;

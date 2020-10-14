@@ -163,7 +163,7 @@ export default {
                 this.FormBlogDate = this.$moment(response.data.DataForm.BlogDate).format('YYYY-MM-DD');
                 this.FormBlogDesc = response.data.DataForm.BlogDesc;
                 this.FormBlogArticle = response.data.DataForm.BlogArticle;
-                this.FormBlogTags = response.data.DataForm.BlogTags.split(',');
+                if(response.data.DataForm.BlogTags != null) this.FormBlogTags = response.data.DataForm.BlogTags.split(',');
             }
         }
     },
