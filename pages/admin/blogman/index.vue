@@ -12,8 +12,7 @@
 					<nuxt-link
 						to="/admin/blogman/insert"
 						class="button is-link is-small"
-						>Tambah Post</nuxt-link
-					>
+						>Tambah Post</nuxt-link>
 				</div>
 				<div class="column is-6">
 					<div class="field is-grouped">
@@ -26,11 +25,7 @@
 							/>
 						</p>
 						<p class="control">
-							<a
-								@click.prevent="onColumnFilter()"
-								class="button is-small is-info"
-								>Search</a
-							>
+							<a @click.prevent="onColumnFilter()" class="button is-small is-info">Search</a>
 						</p>
 					</div>
 				</div>
@@ -80,7 +75,7 @@
 				</template>
 			</vue-good-table>
 		</div>
-		<div class="column">&nbsp;</div>
+		<div class="column"></div>
 	</div>
 </template>
 

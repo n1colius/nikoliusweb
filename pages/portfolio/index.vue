@@ -7,12 +7,7 @@
 					<h3 class="title is-2">Portfolio</h3>
 					<h4 class="subtitle is-5">
 						Posisi saat ini: Team Leader dan Senior Web Developer di
-						<a
-							target="_blank"
-							title="PT Koltiva"
-							href="https://www.koltiva.com"
-							>PT Koltiva</a
-						>
+						<a target="_blank" title="PT Koltiva" href="https://www.koltiva.com">PT Koltiva</a>
 					</h4>
 					<p>
 						Web Developer dengan pengalaman lebih dari
@@ -80,61 +75,13 @@
 						<div class="card-content skills-content">
 							<h3 class="title is-4">Industry Knowledge</h3>
 							<div class="content">
-								<span class="tag is-link">Web Development</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>E-commerce</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>Systems Analysis</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>Object-Oriented Programming (OOP)</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>Database Design</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>RDBMS</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>Inventory System</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-link"
-									>Data Reporting</span
-								>
+								<span class="tag is-link">Web Development</span><span class="tag is-link">E-commerce</span><span class="tag is-link">Systems Analysis</span><span class="tag is-link">Object-Oriented Programming (OOP)</span><span class="tag is-link">Database Design</span><span class="tag is-link">RDBMS</span><span class="tag is-link">Inventory System</span><span class="tag is-link">Data Reporting</span>
 							</div>
 							<br />
 
 							<h3 class="title is-4">Tools & Technologies</h3>
 							<div class="content">
-								<span class="tag is-success">PHP</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>MySQL</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>JavaScript</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Cascading Style Sheets (CSS)</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>HTML</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Linux</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Apache Web Server</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>GIT</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>SVN</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>API RESTful WebServices</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Node.js</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Express.js</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>Nuxt.js</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>ExtJS</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>VueJS</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>AWS S3</span
-								>&nbsp;&nbsp;&nbsp;<span class="tag is-success"
-									>AWS Cognito</span
-								>
+								<span class="tag is-success">PHP</span><span class="tag is-success">MySQL</span><span class="tag is-success">JavaScript</span><span class="tag is-success">Cascading Style Sheets (CSS)</span><span class="tag is-success">HTML</span><span class="tag is-success">Linux</span><span class="tag is-success">Apache Web Server</span><span class="tag is-success">GIT</span><span class="tag is-success">SVN</span><span class="tag is-success">API RESTful WebServices</span><span class="tag is-success">Node.js</span><span class="tag is-success">Express.js</span><span class="tag is-success">Nuxt.js</span><span class="tag is-success">ExtJS</span><span class="tag is-success">VueJS</span><span class="tag is-success">AWS S3</span><span class="tag is-success">AWS Cognito</span>
 							</div>
 						</div>
 					</div>
@@ -294,5 +241,9 @@
 <style scoped>
 .container-portfolio {
 	padding-bottom: 50px;
+}
+.tag {
+	margin-right: 5px;
+	margin-bottom: 5px;
 }
 </style>

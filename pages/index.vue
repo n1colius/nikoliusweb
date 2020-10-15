@@ -20,10 +20,10 @@
 					<h5>Anda bisa menemukan saya di</h5>
 					<br />
 					<div class="columns is-centered">
-						<a href="https://www.facebook.com/nikolius" title="Facebook" target="_blank"><img src="/images/fb.png"/></a>
-						<a title="Twitter" target="_blank" href="https://twitter.com/n1colius"><img src="/images/twitter.png"/></a>
-						<a target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/niko-lius-3138475b/"><img src="/images/linkedin.png"/></a>
-						<a target="_blank" title="GitHub" href="https://github.com/n1colius"><img height="48" src="/images/github.png"/></a>
+						<a class="logo-social" href="https://www.facebook.com/nikolius" title="Facebook" target="_blank"><img src="/images/fb.png"/></a>
+						<a class="logo-social" title="Twitter" target="_blank" href="https://twitter.com/n1colius"><img src="/images/twitter.png"/></a>
+						<a class="logo-social" target="_blank" title="LinkedIn" href="https://www.linkedin.com/in/niko-lius-3138475b/"><img src="/images/linkedin.png"/></a>
+						<a class="logo-social" target="_blank" title="GitHub" href="https://github.com/n1colius"><img height="48" src="/images/github.png"/></a>
 					</div>
 				</div>
 			</div>
@@ -33,4 +33,8 @@
 
 <script></script>
 
-<style scoped></style>
+<style scoped>
+.logo-social {
+	margin-right: 15px;
+}
+</style>
