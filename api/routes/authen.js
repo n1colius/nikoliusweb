@@ -104,12 +104,12 @@ router.get("/refresh", authen, async (req,res) => {
     }
 });
 
-router.post('/', /*[
+router.post('/', [
     check('EmailLogin','Please include valid email').isEmail(),
     check('PasswordLogin','Password is required').not().isEmpty()
-],*/ async (req, res) => {
+], async (req, res) => {
     //validator
-    /*const errors = validationResult(req);
+    const errors = validationResult(req);
     if(!errors.isEmpty()) {
         const ObjErr = errors.array();
         let ExValMsg = [];
@@ -117,7 +117,7 @@ router.post('/', /*[
             ExValMsg.push(ObjErr[key].msg);
         });
         return res.status(200).json({success:false, message: ExValMsg.join('<br>') });
-    }*/
+    }
 
     //console.log(req.body);
     //Pakai yg x-www-form-urlencoded
