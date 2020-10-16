@@ -5,10 +5,19 @@ const bodyParser = require("body-parser");
 // Create express instnace
 const app = express();
 
-//Tambahan code dibawah ini belum coba di test di server, coba aja di server pakai npm run build dan jalankan pakai pm2
-//!!!!!!!!!!!!!!!
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+//redirect www ke non-www
+function redirectWwwTraffic(req, res, next) {
+	if (req.headers.host.slice(0, 4) === 'www.') {
+		var newHost = req.headers.host.slice(4);
+		return res.redirect(301, req.protocol + '://' + newHost + req.originalUrl);
+	}
+	next();
+};  
+app.set('trust proxy', true);
+app.use(redirectWwwTraffic);
 
 // Require & Import API routes
 app.use('/authen', routes.authen);

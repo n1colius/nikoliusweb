@@ -8,23 +8,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//redirect www ke non-www
-app.use(function(req, res, next) {
-	var str = "www.";
-
-	if (req.hostname.indexOf(str) === 0) {
-		res.redirect(
-				301,
-				req.protocol +
-				"://" +
-				req.hostname.slice(str.length) +
-				req.originalUrl
-		);
-	} else {
-		next();
-	}
-});
-
 // Import and Set Nuxt.js options
 const config = require("../nuxt.config.js");
 config.dev = process.env.NODE_ENV !== "production";
