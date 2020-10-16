@@ -1,9 +1,9 @@
 export default function(ctx) {
     try {
         if(ctx.req.headers) {
-            const ArrPartialUrl = ctx.req.headers.referer.split("//");
-            const ProtocolUrl = ArrPartialUrl[0];
-            const HostUrl = ArrPartialUrl[1];
+            let ArrPartialUrl = ctx.req.headers.referer.split("//");
+            let ProtocolUrl = ArrPartialUrl[0];
+            let HostUrl = ArrPartialUrl[1];
             
             if (HostUrl.slice(0, 4) === 'www.') {
                 let NewUrl = HostUrl.slice(4);
