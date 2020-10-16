@@ -31,7 +31,11 @@
 	</div>
 </template>
 
-<script></script>
+<script>
+export default {
+	middleware: ["redirectwww"]
+}
+</script>
 
 <style scoped>
 .logo-social {

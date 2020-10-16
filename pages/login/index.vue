@@ -71,6 +71,7 @@
 import { ValidationObserver, ValidationProvider } from "vee-validate";
 
 export default {
+	middleware: ["redirectwww"],
 	components: {
 		ValidationProvider,
 		ValidationObserver

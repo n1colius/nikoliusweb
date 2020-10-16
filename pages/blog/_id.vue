@@ -54,6 +54,7 @@
 
 <script>
 export default {
+	middleware: ["redirectwww"],
 	validate(context) {
         if (Number.parseInt(context.params.id) > 0) {
             return true;

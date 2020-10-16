@@ -236,7 +236,11 @@
 	</div>
 </template>
 
-<script></script>
+<script>
+export default {
+	middleware: ["redirectwww"]
+}
+</script>
 
 <style scoped>
 .container-portfolio {
