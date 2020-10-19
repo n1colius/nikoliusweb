@@ -79,6 +79,13 @@
                 </div>
 
                 <div class="field">
+                    <label class="label">Description HTML</label>
+                    <div class="control">
+                        <textarea class="input" v-model="FormBlogDesc" placeholder="Description HTML"></textarea>
+                    </div>
+                </div>
+
+                <div class="field">
                     <label class="label">Blog Content</label>
                     <div class="control">
                         <div class="quill-editor" 
@@ -90,6 +97,13 @@
                     <p class="help is-danger">
                         {{ errors[0] }}
                     </p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Blog Content HTML</label>
+                    <div class="control">
+                        <textarea class="input" v-model="FormBlogArticle" placeholder="Blog Content HTML"></textarea>
+                    </div>
                 </div>
 
                 <br>
@@ -238,5 +252,9 @@ export default {
     min-height: 200px;
     max-height: 400px;
     overflow-y: auto;
+}
+
+textarea.input {
+    height: 250px;
 }
 </style>
