@@ -22,6 +22,8 @@ app.use(redirectWwwTraffic);
 // Require & Import API routes
 app.use('/authen', routes.authen);
 app.use('/blogman', routes.blogman);
+app.use('/dotascrap', routes.dotascrap);
+app.use('/dota2heroes', routes.dota2heroes);
 
 // Export the server middleware
 module.exports = {
