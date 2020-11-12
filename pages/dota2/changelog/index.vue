@@ -10,5 +10,10 @@
                 <li>Add Basic Heroes Information</li>
             </ul>
         </div>
+        <br><br>
+
+        <div class="comments">
+            <Disqus />
+        </div>
     </div>
 </template>

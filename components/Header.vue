@@ -6,7 +6,7 @@
                     <nuxt-link class="navbar-item" to="/">
                         <img src="/images/logoniko.png" alt="Logo" />
                     </nuxt-link>
-                    <span class="navbar-burger burger" data-target="navbarMenu">
+                    <span @click.prevent="BurgerMenu()" class="navbar-burger burger" data-target="navbarMenu">
                         <span /><span /><span />
                     </span>
                 </div>
@@ -39,34 +39,13 @@
                         <template v-else>
                             <nuxt-link to="/login" class="navbar-item">Login</nuxt-link>
                         </template>
-                        <!--<div class="navbar-item has-dropdown is-hoverable">
-                            <a class="navbar-link">Account</a>
-                            <div class="navbar-dropdown">
-                                <a class="navbar-item">Dashboard</a>
-                                <a class="navbar-item">Profile</a>
-                                <a class="navbar-item">Settings</a>
-                                <hr class="navbar-divider">
-                                <div class="navbar-item">Logout</div>
-                            </div>
-                        </div>-->
+                        
                     </div>
                 </div>
 
             </div>
         </nav>
         <hr class="HeaderSeparator">
-
-        <!-- Script click menu burger -->
-        <script>
-        (function() {
-            var burger = document.querySelector('.burger');
-            var menu = document.querySelector('#'+burger.dataset.target);
-            burger.addEventListener('click', function() {
-                burger.classList.toggle('is-active');
-                menu.classList.toggle('is-active');
-            });
-        })();
-        </script>
     </div>
 </template>
 
@@ -81,7 +60,13 @@ export default {
         ClickLogout() {
             this.$store.dispatch("authen/SetLogout");
             this.$router.push("/"); //balik ke home
-		}
+        },
+        BurgerMenu() {
+            var burger = document.querySelector('.burger');
+            var menu = document.querySelector('#'+burger.dataset.target);
+            burger.classList.toggle('is-active');
+            menu.classList.toggle('is-active');
+        }
     }
 }
 </script>

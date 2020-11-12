@@ -40,7 +40,7 @@
 						<hr>
 						<p class="ContentBlog" v-html="BlogArticle"></p>
 
-						 <div class="comments">
+						<div class="comments">
 							<Disqus />
 						</div>
 
