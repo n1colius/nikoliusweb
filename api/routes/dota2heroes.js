@@ -309,8 +309,23 @@ router.post('/hapusnotes', [authen, [
 router.get('/displayhero', async(req,res) => {
     let DataReturn = [];
     let Query;
-    let SearchHeroName = req.query.SearchHeroName;
+    let HeroSearchValue = req.query.HeroSearchValue;
     let SearchHeroType = req.query.HeroType;
+    let SearchHeroID = [];
+    let SearhHeroIDStr = '';
+    let ObjTmp = {};
+
+    //Searching Hero
+    if(Object.prototype.toString.call(HeroSearchValue) === '[object Array]') {
+        Object.keys(HeroSearchValue).forEach(key => {
+            ObjTmp = JSON.parse(HeroSearchValue[key]);
+            SearchHeroID.push(ObjTmp.CmbHeroID);
+        });
+
+        if(SearchHeroID.length > 0) {
+            SearhHeroIDStr = ' AND a.HeroID IN ('+SearchHeroID.join(',')+')';
+        }
+    }
 
     try {
         Query = `SELECT
@@ -326,10 +341,30 @@ router.get('/displayhero', async(req,res) => {
                     LEFT JOIN dota_heroes_notes c ON a.HeroID = c.HeroID
                 WHERE 1=1
                     AND a.PrimAttr = ?
-                    AND a.HeroName LIKE ?
+                    ${SearhHeroIDStr}
                 GROUP BY a.HeroID`;
-        DataReturn = await sql.query(Query, [SearchHeroType, `%${SearchHeroName}%`]);
+        DataReturn = await sql.query(Query, [SearchHeroType]);
         
+        return res.status(200).json({success: true, message: 'Call Success', DataReturn: DataReturn});
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({success: 'failed'});    
+    }
+});
+
+router.get('/cmbheroes', async(req,res) => {
+    let DataReturn = [];
+    let Query;
+
+    try {
+        Query = `SELECT
+                    a.HeroID AS CmbHeroID
+                    , a.HeroName AS CmbHeroName
+                FROM
+                    dota_heroes a
+                WHERE 1=1
+                ORDER BY a.HeroID ASC`;
+        DataReturn = await sql.query(Query);
         return res.status(200).json({success: true, message: 'Call Success', DataReturn: DataReturn});
     } catch (err) {
         console.error(err.message);

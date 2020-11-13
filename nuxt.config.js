@@ -88,7 +88,8 @@ module.exports = {
 				]
 			}
 		],
-		"vue-social-sharing/nuxt"
+		"vue-social-sharing/nuxt",
+		"nuxt-vue-multiselect"
 	],
 	toast: {
 		position: "top-right",

@@ -7,18 +7,13 @@
 
                 <div class="columns is-desktop">
                     <div class="column"></div>
-                    <div class="column is-8">
+                    <div class="column is-10">
                         <div class="field is-grouped">
                             <p class="control is-expanded">
-                                <input
-                                    class="input is-small"
-                                    type="text"
-                                    placeholder="Search by Hero Name"
-                                    v-model="SearchHeroName"
-                                />
+                                <multiselect v-model="HeroSearchValue" tag-placeholder="Add hero to search" placeholder="Search hero" label="CmbHeroName" track-by="CmbHeroID" :options="CmbHeroes" :multiple="true" :taggable="true" @tag="addSearchHero"></multiselect>
                             </p>
                             <p class="control">
-                                <a @click.prevent="SearchHeroes()" class="button is-small is-info">Search</a>
+                                <a @click.prevent="SearchHeroes()" class="button is-medium is-info">Search</a>
                             </p>
                         </div>
                     </div>
@@ -132,12 +127,14 @@ export default {
             SearchHeroName: "",
             HeroStr: [],
             HeroAgi: [],
-            HeroInt: []
+            HeroInt: [],
+            HeroSearchValue: [],
+            CmbHeroes: []
         }
     },
     async asyncData(context) {
 		try {
-            const [HeroStrRes,HeroAgiRes, HeroIntRes ] = await Promise.all([
+            const [HeroStrRes,HeroAgiRes, HeroIntRes, CmbHeroesRes ] = await Promise.all([
                 context.$axios.get("dota2heroes/displayhero", {
 					params: {
                         HeroType: 'str',
@@ -155,13 +152,15 @@ export default {
                         HeroType: 'int',
 						SearchHeroName: ""
 					}
-				})
+                }),
+                context.$axios.get("dota2heroes/cmbheroes")
             ]);
             
             return {
                 HeroStr: HeroStrRes.data.DataReturn,
                 HeroAgi: HeroAgiRes.data.DataReturn,
-                HeroInt: HeroIntRes.data.DataReturn
+                HeroInt: HeroIntRes.data.DataReturn,
+                CmbHeroes: CmbHeroesRes.data.DataReturn
             }
 		} catch (err) {
             console.log('err :>> ', err);
@@ -170,23 +169,24 @@ export default {
     methods: {
 		async SearchHeroes() {
             try {
+                console.log('this.value', this.value);
                 const [HeroStrRes,HeroAgiRes, HeroIntRes ] = await Promise.all([
                     this.$axios.get("dota2heroes/displayhero", {
                         params: {
                             HeroType: 'str',
-                            SearchHeroName: this.SearchHeroName
+                            HeroSearchValue: this.HeroSearchValue
                         }
                     }),
                     this.$axios.get("dota2heroes/displayhero", {
                         params: {
                             HeroType: 'agi',
-                            SearchHeroName: this.SearchHeroName
+                            HeroSearchValue: this.HeroSearchValue
                         }
                     }),
                     this.$axios.get("dota2heroes/displayhero", {
                         params: {
                             HeroType: 'int',
-                            SearchHeroName: this.SearchHeroName
+                            HeroSearchValue: this.HeroSearchValue
                         }
                     })
                 ]);
@@ -202,6 +202,14 @@ export default {
 					}
 				);
             }    
+        },
+        addSearchHero (newSearch) {
+            const searchHero = {
+                CmbHeroName: newSearch,
+                CmbHeroId: newSearch.substring(0, 2) + Math.floor((Math.random() * 10000000))
+            }
+            this.CmbHeroes.push(searchHero);
+            this.HeroSearchValue.push(searchHero);
         }
     }
 }

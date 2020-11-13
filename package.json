@@ -29,6 +29,7 @@
     "mysql": "^2.18.1",
     "nuxt": "^2.0.0",
     "nuxt-fontawesome": "^0.4.0",
+    "nuxt-vue-multiselect": "^1.0.4",
     "vee-validate": "^3.3.7",
     "vue-disqus": "^4.0.1",
     "vue-good-table": "^2.21.0",
