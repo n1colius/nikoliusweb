@@ -372,4 +372,699 @@ router.get('/cmbheroes', async(req,res) => {
     }
 });
 
+router.get('/analyze', async(req,res) => {
+    let DataReturn = [];
+    let Query, QueryWinLose, QueryInfoHero;
+    let ValidasiParamSearch = true;
+    let RadiantHeroSearchValue = req.query.RadiantHeroSearchValue;
+    let DireHeroSearchValue = req.query.DireHeroSearchValue;
+    let RadiantHeroID = [];
+    let DireHeroID = [];
+    let RadiantDireHeroID = [];
+    let ObjTmp = {};
+    let WinRate;
+    let ResWinMatch, ResLoseMatch, ResInfoHero;
+
+    let ReturnObj = {};
+    let InfoHeroRadiant1;
+    let InfoHeroRadiant2;
+    let InfoHeroRadiant3;
+    let InfoHeroRadiant4;
+    let InfoHeroRadiant5;
+    let InfoHeroDire1;
+    let InfoHeroDire2;
+    let InfoHeroDire3;
+    let InfoHeroDire4;
+    let InfoHeroDire5;
+    let ReturnRadiant1 = [];
+    let ReturnRadiant2 = [];
+    let ReturnRadiant3 = [];
+    let ReturnRadiant4 = [];
+    let ReturnRadiant5 = [];
+    let ReturnDire1 = [];
+    let ReturnDire2 = [];
+    let ReturnDire3 = [];
+    let ReturnDire4 = [];
+    let ReturnDire5 = [];
+
+    function checkForDuplicates(array) {
+        return new Set(array).size !== array.length
+    }
+
+    if(Object.prototype.toString.call(RadiantHeroSearchValue) === '[object Array]') {
+        Object.keys(RadiantHeroSearchValue).forEach(key => {
+            ObjTmp = JSON.parse(RadiantHeroSearchValue[key]);
+            RadiantHeroID.push(ObjTmp.CmbHeroID);
+            RadiantDireHeroID.push(ObjTmp.CmbHeroID);
+        });
+    }
+    if(Object.prototype.toString.call(DireHeroSearchValue) === '[object Array]') {
+        Object.keys(DireHeroSearchValue).forEach(key => {
+            ObjTmp = JSON.parse(DireHeroSearchValue[key]);
+            DireHeroID.push(ObjTmp.CmbHeroID);
+            RadiantDireHeroID.push(ObjTmp.CmbHeroID);
+        });
+    }
+
+    //Cek apakah masing2 5 hero yg terpilih, dan ada hero duplikat
+    if(RadiantHeroID.length != 5) ValidasiParamSearch = false;
+    if(DireHeroID.length != 5) ValidasiParamSearch = false;
+    if(checkForDuplicates(RadiantDireHeroID)) ValidasiParamSearch = false;
+
+    if(ValidasiParamSearch === false) {
+        return res.status(200).json({success: false, message: 'Must select 5 heroes for each team and no duplicate heroes'});
+    } else {
+
+        QueryWinLose = `SELECT
+                    COUNT(a.MatchID) AS Jumlah
+                FROM
+                    dota_matches_heroes_winstats a
+                WHERE 1=1
+                    AND a.HeroIDWin = ?
+                    AND a.HeroIDLose = ?`;
+        QueryInfoHero = `select
+                            a.HeroName
+                            , a.Picture
+                        from
+                            dota_heroes a
+                        where 1=1
+                            and a.HeroID = ?
+                        limit 1`;
+
+
+        //INFO HERO ========================= (Begin)
+        InfoHeroRadiant1 = await sql.query(QueryInfoHero, [RadiantHeroID[0]]);
+        InfoHeroRadiant2 = await sql.query(QueryInfoHero, [RadiantHeroID[1]]);
+        InfoHeroRadiant3 = await sql.query(QueryInfoHero, [RadiantHeroID[2]]);
+        InfoHeroRadiant4 = await sql.query(QueryInfoHero, [RadiantHeroID[3]]);
+        InfoHeroRadiant5 = await sql.query(QueryInfoHero, [RadiantHeroID[4]]);
+        InfoHeroDire1 = await sql.query(QueryInfoHero, [DireHeroID[0]]);
+        InfoHeroDire2 = await sql.query(QueryInfoHero, [DireHeroID[1]]);
+        InfoHeroDire3 = await sql.query(QueryInfoHero, [DireHeroID[2]]);
+        InfoHeroDire4 = await sql.query(QueryInfoHero, [DireHeroID[3]]);
+        InfoHeroDire5 = await sql.query(QueryInfoHero, [DireHeroID[4]]);
+        //INFO HERO ========================= (End)
+
+        //================================================================================= RADIANT Hero 1 (BEGIN) =======================================================
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[0], DireHeroID[0]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[0], RadiantHeroID[0]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire1[0].Picture;
+        ReturnRadiant1.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire1[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant1[0].Picture;
+        ReturnDire1.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[0], DireHeroID[1]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[1], RadiantHeroID[0]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire2[0].Picture;
+        ReturnRadiant1.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire2[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant1[0].Picture;
+        ReturnDire2.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[0], DireHeroID[2]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[2], RadiantHeroID[0]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire3[0].Picture;
+        ReturnRadiant1.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire3[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant1[0].Picture;
+        ReturnDire3.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[0], DireHeroID[3]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[3], RadiantHeroID[0]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire4[0].Picture;
+        ReturnRadiant1.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire4[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant1[0].Picture;
+        ReturnDire4.push(ObjTmp);
+        
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[0], DireHeroID[4]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[4], RadiantHeroID[0]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire5[0].Picture;
+        ReturnRadiant1.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire5[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant1[0].Picture;
+        ReturnDire5.push(ObjTmp);
+        //================================================================================= RADIANT Hero 1 (END) =======================================================
+
+        //================================================================================= RADIANT Hero 2 (BEGIN) =======================================================
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[1], DireHeroID[0]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[0], RadiantHeroID[1]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire1[0].Picture;
+        ReturnRadiant2.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire1[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant2[0].Picture;
+        ReturnDire1.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[1], DireHeroID[1]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[1], RadiantHeroID[1]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire2[0].Picture;
+        ReturnRadiant2.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire2[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant2[0].Picture;
+        ReturnDire2.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[1], DireHeroID[2]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[2], RadiantHeroID[1]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire3[0].Picture;
+        ReturnRadiant2.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire3[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant2[0].Picture;
+        ReturnDire3.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[1], DireHeroID[3]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[3], RadiantHeroID[1]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire4[0].Picture;
+        ReturnRadiant2.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire4[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant2[0].Picture;
+        ReturnDire4.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[1], DireHeroID[4]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[4], RadiantHeroID[1]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire5[0].Picture;
+        ReturnRadiant2.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire5[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant2[0].Picture;
+        ReturnDire5.push(ObjTmp);
+        //================================================================================= RADIANT Hero 2 (END) =======================================================
+
+        //================================================================================= RADIANT Hero 3 (Begin) =======================================================
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[2], DireHeroID[0]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[0], RadiantHeroID[2]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire1[0].Picture;
+        ReturnRadiant3.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire1[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant3[0].Picture;
+        ReturnDire1.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[2], DireHeroID[1]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[1], RadiantHeroID[2]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire2[0].Picture;
+        ReturnRadiant3.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire2[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant3[0].Picture;
+        ReturnDire2.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[2], DireHeroID[2]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[2], RadiantHeroID[2]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire3[0].Picture;
+        ReturnRadiant3.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire3[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant3[0].Picture;
+        ReturnDire3.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[2], DireHeroID[3]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[3], RadiantHeroID[2]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire4[0].Picture;
+        ReturnRadiant3.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire4[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant3[0].Picture;
+        ReturnDire4.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[2], DireHeroID[4]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[4], RadiantHeroID[2]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire5[0].Picture;
+        ReturnRadiant3.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire5[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant3[0].Picture;
+        ReturnDire5.push(ObjTmp);
+        //================================================================================= RADIANT Hero 3 (END) =======================================================
+
+        //================================================================================= RADIANT Hero 4 (BEGIN) =======================================================
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[3], DireHeroID[0]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[0], RadiantHeroID[3]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire1[0].Picture;
+        ReturnRadiant4.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire1[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant4[0].Picture;
+        ReturnDire1.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[3], DireHeroID[1]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[1], RadiantHeroID[3]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire2[0].Picture;
+        ReturnRadiant4.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire2[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant4[0].Picture;
+        ReturnDire2.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[3], DireHeroID[2]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[2], RadiantHeroID[3]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire3[0].Picture;
+        ReturnRadiant4.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire3[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant4[0].Picture;
+        ReturnDire3.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[3], DireHeroID[3]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[3], RadiantHeroID[3]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire4[0].Picture;
+        ReturnRadiant4.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire4[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant4[0].Picture;
+        ReturnDire4.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[3], DireHeroID[4]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[4], RadiantHeroID[3]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire5[0].Picture;
+        ReturnRadiant4.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire5[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant4[0].Picture;
+        ReturnDire5.push(ObjTmp);
+        //================================================================================= RADIANT Hero 4 (END) =======================================================
+
+        //================================================================================= RADIANT Hero 5 (BEGIN) =======================================================
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[4], DireHeroID[0]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[0], RadiantHeroID[4]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire1[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire1[0].Picture;
+        ReturnRadiant5.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire1[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire1[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant5[0].Picture;
+        ReturnDire1.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[4], DireHeroID[1]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[1], RadiantHeroID[4]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire2[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire2[0].Picture;
+        ReturnRadiant5.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire2[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire2[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant5[0].Picture;
+        ReturnDire2.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[4], DireHeroID[2]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[2], RadiantHeroID[4]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire3[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire3[0].Picture;
+        ReturnRadiant5.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire3[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire3[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant5[0].Picture;
+        ReturnDire3.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[4], DireHeroID[3]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[3], RadiantHeroID[4]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire4[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire4[0].Picture;
+        ReturnRadiant5.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire4[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire4[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant5[0].Picture;
+        ReturnDire4.push(ObjTmp);
+
+        ResWinMatch = await sql.query(QueryWinLose, [RadiantHeroID[4], DireHeroID[4]]);
+        ResLoseMatch = await sql.query(QueryWinLose, [DireHeroID[4], RadiantHeroID[4]]);
+        WinRate = ( ResWinMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.Picture = InfoHeroRadiant5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroDire5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroDire5[0].Picture;
+        ReturnRadiant5.push(ObjTmp);
+        WinRate = ( ResLoseMatch[0].Jumlah / ( ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah ) ) * 100;
+        ObjTmp = {};
+        ObjTmp.WinRate = parseFloat(WinRate).toFixed(1);
+        if(isNaN(ObjTmp.WinRate)) ObjTmp.WinRate = 0;
+        ObjTmp.TotalMatch = ResWinMatch[0].Jumlah + ResLoseMatch[0].Jumlah;
+        ObjTmp.Hero = InfoHeroDire5[0].HeroName;
+        ObjTmp.Picture = InfoHeroDire5[0].Picture;
+        ObjTmp.HeroAgainst = InfoHeroRadiant5[0].HeroName;
+        ObjTmp.PictureAgainst = InfoHeroRadiant5[0].Picture;
+        ReturnDire5.push(ObjTmp);
+        //================================================================================= RADIANT Hero 5 (END) =======================================================
+
+        //console.log(`ReturnRadiant1:`,ReturnRadiant1);
+        ReturnObj.ObjRadiant1 = ReturnRadiant1;
+        ReturnObj.ObjRadiant2 = ReturnRadiant2;
+        ReturnObj.ObjRadiant3 = ReturnRadiant3;
+        ReturnObj.ObjRadiant4 = ReturnRadiant4;
+        ReturnObj.ObjRadiant5 = ReturnRadiant5;
+        ReturnObj.ObjDire1 = ReturnDire1;
+        ReturnObj.ObjDire2 = ReturnDire2;
+        ReturnObj.ObjDire3 = ReturnDire3;
+        ReturnObj.ObjDire4 = ReturnDire4;
+        ReturnObj.ObjDire5 = ReturnDire5;
+
+        return res.status(200).json({success: true, ReturnObj:ReturnObj, message: 'Process Success'});
+    }
+});
+
 export default router;

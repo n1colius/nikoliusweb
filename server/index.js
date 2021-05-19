@@ -39,7 +39,9 @@ async function start() {
 	app.use(nuxt.render);
 
 	// Listen the server
-	app.listen(port, host);
+	let ServerListen = app.listen(port, host);
+	ServerListen.setTimeout(3600000); //timeout 2 jam
+
 	consola.ready({
 		message: `Server listening on http://${host}:${port}`,
 		badge: true

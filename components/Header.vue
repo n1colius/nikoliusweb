@@ -22,6 +22,7 @@
                             <a class="navbar-link">Dota2 Simple Stats</a>
                             <div class="navbar-dropdown">
                                 <nuxt-link class="navbar-item" to="/dota2/heroes">Heroes</nuxt-link>
+                                <nuxt-link class="navbar-item" to="/dota2/matchana">Match Analysis</nuxt-link>
                                 <nuxt-link class="navbar-item" to="/dota2/changelog">Changelog</nuxt-link>
                             </div>
                         </div>
